@@ -10,8 +10,7 @@ use WWW::Station::API::Provider::Common;
 our @EXPORT_OK = qw/fetch_pref_id get_lines_by_pref/;
 
 sub fetch_pref_id{
- my $self = shift;
- my $arg  = shift;
+  @prefs = WWW::Station::API->pref;
 
  if($arg =~ /\A\d{2}\Z/){
    return $arg;
@@ -25,7 +24,7 @@ sub _retrieve_id_by_name{
  
   foreach my $nef(@$pref){
     foreach my $key(keys %$nef){
-      return $key if $$nef{$key} eq $name;
+      return $key if $nef->{$key} eq $name;
     }
   }
 

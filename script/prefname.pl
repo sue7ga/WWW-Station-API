@@ -15,7 +15,7 @@ my @lines = $station->pref;
 
 foreach my $nef(@lines){
   foreach my $key(keys %$nef){
-    $$nef{$key};
+    print $nef->{$key};
   }
 }
 
