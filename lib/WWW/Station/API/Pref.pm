@@ -11,7 +11,6 @@ our @EXPORT_OK = qw/fetch_pref_id get_lines_by_pref/;
 
 sub fetch_pref_id{
  my $self = shift;
- my @prefs = @{$self->pref};
  my $arg  = shift;
 
  if($arg =~ /\A\d{2}\Z/){
@@ -23,7 +22,14 @@ sub fetch_pref_id{
 
 sub _retrieve_id_by_name{
   my($name,$pref) = @_;
+ 
+  foreach my $nef(@$pref){
+    foreach my $key(keys %$nef){
+      return $key if $$nef{$key} eq $name;
+    }
+  }
 
+  croak encode_utf8("No such pref:$name");
 }
 
 sub get_lines_by_pref{
