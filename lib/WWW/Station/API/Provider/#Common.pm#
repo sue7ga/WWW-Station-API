@@ -23,7 +23,7 @@ $res->{_content} =~ s/;//;
 $res->{_content} =~ s/if\(typeof\(\)==\'undefined\'\)  = {}//g;
 $res->{_content} =~ s/if\(typeof\(.onload\)==\'function\'\) .onload\(.data\);//g;
  my $data = $res->is_success? decode_json($res->{_content}):"";
- return \%{$data};
+ 
 }
 
 sub call{

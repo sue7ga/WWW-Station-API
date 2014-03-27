@@ -6,6 +6,7 @@ our $VERSION = "0.01";
 use Text::CSV;
 use FindBin;
 use Carp;
+use WWW::Station::API::Pref qw/fetch_pref_id get_lines_by_pref/;
 
 sub new{
  my($class,%opt) = @_;
@@ -19,6 +20,12 @@ sub new{
 sub pref_id{
  my $self = shift;
  return $self->{pref_id};
+}
+
+sub get_url{
+ my $self = shift;
+ my $url =  get_lines_by_pref($self->pref_id);
+ return @{$url->{line}};
 }
 
 use Data::Dumper;
@@ -40,7 +47,7 @@ sub pref{
    push @$pref_infos,$pref;
  }
  close $fh;
- return $pref_infos;
+ return @{$pref_infos};
 }
 
 sub company{
