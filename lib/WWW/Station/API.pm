@@ -2,11 +2,12 @@ package WWW::Station::API;
 use 5.008005;
 use strict;
 use warnings;
+use utf8;
 our $VERSION = "0.01";
 use Text::CSV;
 use FindBin;
 use Carp;
-use WWW::Station::API::Pref qw/fetch_pref_id get_lines_by_pref/;
+use WWW::Station::API::Pref qw/fetch_pref_cd get_lines_by_pref get_linedata_by_linecode get_ekidata_by_stationcode get_ekigroupdata_by_stationcode get_neardata_by_linecode/;
 
 sub new{
  my($class,%opt) = @_;
@@ -22,10 +23,17 @@ sub pref_id{
  return $self->{pref_id};
 }
 
+sub get_pref_id{
+ my $self = shift;
+ my $arg  = shift;
+ my $pref_cd = fetch_pref_cd($arg);
+ return $pref_cd;
+}
+
 sub get_url{
  my $self = shift;
- my $url =  get_lines_by_pref($self->pref_id);
- return @{$url->{line}};
+ my $url = get_neardata_by_linecode(11302);
+ return @{$url->{station_join}};
 }
 
 use Data::Dumper;

@@ -13,25 +13,35 @@ use LWP::UserAgent;
 sub dispatch{
   my $self = shift;
   my $type = shift;
-  my $pref_id = shift;
-  my $url = API_ENDPOINT."/p/".$pref_id.".json";
-  my $ua = LWP::UserAgent->new;
-  my $res = $ua->get($url);
-$res->{_content} =~ s/xml.data =//g;
-$res->{_content} =~ s/xml//g;
-$res->{_content} =~ s/;//;
-$res->{_content} =~ s/if\(typeof\(\)==\'undefined\'\)  = {}//g;
-$res->{_content} =~ s/if\(typeof\(.onload\)==\'function\'\) .onload\(.data\);//g;
- my $data = $res->is_success? decode_json($res->{_content}):"";
- return \%{$data};
+  my $arg = shift;
+  my $url;
+  if($type eq 'pref'){
+    $url = API_ENDPOINT."/p/".$arg.".json";
+  }elsif($type eq 'line'){
+    $url = API_ENDPOINT."/l/".$arg.".json";
+  }elsif($type eq 'station'){
+    $url = API_ENDPOINT."/s/".$arg.".json";
+  }elsif($type eq 'stationcode'){
+    $url = API_ENDPOINT."/g/".$arg.".json";
+  }elsif($type eq 'near'){
+    $url = API_ENDPOINT."/n/".$arg.".json";
+  }
+  $self->call($url);
 }
 
 sub call{
-
-
-
+  my $self = shift;
+  my $url = shift;
+  my $ua = LWP::UserAgent->new;
+  my $res = $ua->get($url);
+  $res->{_content} =~ s/xml.data =//g;
+  $res->{_content} =~ s/xml//g;
+  $res->{_content} =~ s/;//;
+  $res->{_content} =~ s/if\(typeof\(\)==\'undefined\'\)  = {}//g;
+  $res->{_content} =~ s/if\(typeof\(.onload\)==\'function\'\) .onload\(.data\);//g;
+  my $data = $res->is_success? decode_json($res->{_content}):"";
+  return $data;
 }
 
-
-
 1;
+

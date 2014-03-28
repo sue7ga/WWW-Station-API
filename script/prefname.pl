@@ -11,11 +11,9 @@ my $station = WWW::Station::API->new(pref_id => 14);
 
 use Data::Dumper;
 
-my @lines = $station->pref;
+my @stations = $station->get_url;
 
-foreach my $nef(@lines){
-  foreach my $key(keys %$nef){
-    print $nef->{$key};
-  }
+foreach my $key(@stations){
+  print $key->{station_name2},"\n";
 }
 
