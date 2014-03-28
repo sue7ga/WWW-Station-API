@@ -7,7 +7,7 @@ our $VERSION = "0.01";
 use Text::CSV;
 use FindBin;
 use Carp;
-use WWW::Station::API::Pref qw/fetch_pref_cd get_lines_by_pref get_linedata_by_linecode get_ekidata_by_stationcode get_ekigroupdata_by_stationcode get_neardata_by_linecode/;
+use WWW::Station::API::Pref qw/fetch_pref_cd get_lines_by_pref get_linedata_by_linecode get_ekidata_by_stationcode get_ekigroupdata_by_stationcode get_neardata_by_linecode exists_line_by_linenumber/;
 
 sub new{
  my($class,%opt) = @_;
@@ -28,6 +28,22 @@ sub get_pref_id{
  my $arg  = shift;
  my $pref_cd = fetch_pref_cd($arg);
  return $pref_cd;
+}
+
+sub exists_line_by_linenumber{
+  my $self = shift;
+  my $linenumber = shift;
+  my $station = shift;
+  my $station_name = get_linedata_by_linecode($linenumber);
+  my @station_infos = @{$station_name->{station_l}};
+  my @stations;
+  foreach my $key(@station_infos){
+    push @stations,$key->{station_name};
+  }
+  my %stations = map{$_ => 1}@stations;
+  if($stations{$station}){
+    return "aaa";
+  }
 }
 
 sub get_url{
@@ -138,8 +154,8 @@ sub line{
 }
 
 sub station{
-   my $self = shift;
-   my $file = $basic_file."/../Data/station20140303free.csv";
+  my $self = shift;
+  my $file = $basic_file."/../Data/station20140303free.csv";
   my $csv = Text::CSV->new({
     auto_diag => 1,
     binary => 1,

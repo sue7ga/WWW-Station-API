@@ -7,11 +7,11 @@ use Encode;
 use Text::CSV;
 use parent qw/Exporter/;
 use WWW::Station::API::Provider::Common;
-our @EXPORT_OK = qw/fetch_pref_cd get_lines_by_pref get_linedata_by_linecode get_ekidata_by_stationcode get_ekigroupdata_by_stationcode get_neardata_by_linecode/;
+our @EXPORT_OK = qw/fetch_pref_cd get_lines_by_pref get_linedata_by_linecode get_ekidata_by_stationcode get_ekigroupdata_by_stationcode get_neardata_by_linecode exists_line_by_linenumber/;
 
 sub fetch_pref_cd{
-  my $arg = shift;
-  my @prefs = WWW::Station::API->pref;
+ my $arg = shift;
+ my @prefs = WWW::Station::API->pref;
  if($arg =~ /\A\d{2}\Z/){
    return $arg;
  }
@@ -60,3 +60,4 @@ sub get_neardata_by_linecode{
 }
 
 1;
+

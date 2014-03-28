@@ -11,9 +11,6 @@ my $station = WWW::Station::API->new(pref_id => 14);
 
 use Data::Dumper;
 
-my @stations = $station->get_url;
+my $true_false = $station->exists_line_by_linenumber(11306,'橋本');
 
-foreach my $key(@stations){
-  print $key->{station_name2},"\n";
-}
-
+print Dumper $true_false;
