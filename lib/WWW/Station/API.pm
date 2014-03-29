@@ -28,9 +28,7 @@ sub get_line_cd_by_pref{
  my $pref_cd = shift;
 
  my @line_cds = $self->get_linecds_by_prefcd($pref_cd);
-
  my @uniq_line_cds = List::MoreUtils::uniq @line_cds;
-
  my @line_names = $self->get_linename_by_linecd(\@uniq_line_cds);
 
  return @line_names;
@@ -53,18 +51,32 @@ sub get_linecds_by_prefcd{
  my $pref = shift;
 
  my $station_infos = $self->station; 
- my @line_cds = map{$_->{line_cd}}grep{ $_->{pref_cd} eq $pref}@$station_infos; 
+ my @line_cds = map{$_->{line_cd}}grep{ $_->{pref_cd} eq $pref}@$station_infos;
 
  return @line_cds;
 }
 
 sub get_stationname_by_prefcd_and_linecd{
   my $self = shift;
+  #数値
   my $pref_cd = shift;
-  my $line_cd = shift;
+  #配列リファレンス
+  my $line_cds = shift;
+  my $station_infos = $self->station;
+  my @station_names = map{$_->{station_name}}grep{ $_->{line_cd} ~~ @$line_cds and $_->{pref_cd} == $pref_cd}@$station_infos;
+  return @station_names;
+}
 
-
-
+sub get_linename_and_stationname_by_prefcd{
+ my $self = shift;
+ my $prefcd = shift;
+ my $station_infos = $self->station;
+ my $line_infos = $self->line;
+ my @line_cds = map{$_->{line_cd}}grep{$_->{pref_cd} == $prefcd}@$station_infos;
+ my @uniq_line_cds = List::MoreUtils::uniq @line_cds;
+ my @line_names = map{$_->{line_name}}grep{$_->{line_cd} ~~ @uniq_line_cds}@$line_infos;
+ my @stationname = map{$_->{station_name}}grep{$_->{pref_cd} == $prefcd and $_->{line_cd} ~~ @uniq_line_cds}@$station_infos;
+ return(\@line_names,\@stationname);
 }
 
 sub get_pref_id{
