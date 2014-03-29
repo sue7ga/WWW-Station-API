@@ -25,17 +25,46 @@ sub pref_id{
 
 sub get_line_cd_by_pref{
  my $self = shift;
+ my $pref_cd = shift;
+
+ my @line_cds = $self->get_linecds_by_prefcd($pref_cd);
+
+ my @uniq_line_cds = List::MoreUtils::uniq @line_cds;
+
+ my @line_names = $self->get_linename_by_linecd(\@uniq_line_cds);
+
+ return @line_names;
+}
+
+#ラインcdから路線名を返す
+sub get_linename_by_linecd{
+ my $self = shift;
+ my $linecd = shift;
+
+ my $line_infos = $self->line;
+ my @line_names = map{$_->{line_name}}grep{$_->{line_cd} ~~ @{$linecd}}@$line_infos;
+
+ return @line_names;
+}
+
+#都道府県cdから都道府県内のline_cdsを返す
+sub get_linecds_by_prefcd{
+ my $self = shift;
  my $pref = shift;
 
  my $station_infos = $self->station; 
- my @line_cds = map{$_->{line_cd}}grep{ $_->{pref_cd} eq $pref}@$station_infos;
+ my @line_cds = map{$_->{line_cd}}grep{ $_->{pref_cd} eq $pref}@$station_infos; 
 
- my @uniq_line_cds = @line_cds;
+ return @line_cds;
+}
 
- my $line_infos = $self->line;
- my @line_names = map{$_->{line_name}}grep{$_->{line_cd} ~~@uniq_line_cds }@$line_infos;
+sub get_stationname_by_prefcd_and_linecd{
+  my $self = shift;
+  my $pref_cd = shift;
+  my $line_cd = shift;
 
- return @line_names;
+
+
 }
 
 sub get_pref_id{
