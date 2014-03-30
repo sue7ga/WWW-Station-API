@@ -23,6 +23,13 @@ sub pref_id{
  return $self->{pref_id};
 }
 
+sub get_neardata{
+ my $self = shift;
+ my $linecode = shift;
+ my $url = get_neardata_by_linecode($linecode);
+ return $url;
+}
+
 sub get_line_cd_by_prefcd{
  my $self = shift;
  my $pref_cd = shift;
@@ -38,10 +45,8 @@ sub get_line_cd_by_prefcd{
 sub get_linename_by_linecd{
  my $self = shift;
  my $linecd = shift;
-
  my $line_infos = $self->line;
  my @line_names = map{$_->{line_name}}grep{$_->{line_cd} ~~ @{$linecd}}@$line_infos;
-
  return @line_names;
 }
 
@@ -49,10 +54,8 @@ sub get_linename_by_linecd{
 sub get_linecds_by_prefcd{
  my $self = shift;
  my $pref = shift;
-
  my $station_infos = $self->station; 
  my @line_cds = map{$_->{line_cd}}grep{ $_->{pref_cd} eq $pref}@$station_infos;
-
  return @line_cds;
 }
 
@@ -140,10 +143,10 @@ sub company{
  open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
  $csv->column_names($csv->getline($fh));
  my $company_infos = [];
- my @company = qw/company_cd rr_cd company_name company_name_k company_name_h company_name_r company_url company_type e_status e_sort/;
+ my @keys = qw/company_cd rr_cd company_name company_name_k company_name_h company_name_r company_url company_type e_status e_sort/;
  while(my $row = $csv->getline_hr($fh)){
   my $company = {};
-  foreach my $key(@company){
+  foreach my $key(@keys){
     $company->{$key} = $row->{$key};
   }
   push @$company_infos,$company;
@@ -237,6 +240,7 @@ sub station{
 }
 
 1;
+
 
 
 __END__

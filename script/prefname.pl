@@ -12,6 +12,9 @@ my $station = WWW::Station::API->new(pref_id => 14);
 
 use Data::Dumper;
 
-my $companyinfos = $station->company;
+my $neardata = $station->get_neardata(11312);
 
-print Dumper $companyinfos;
+
+foreach my $key(@{$neardata->{station_join}}){
+  print Encode::encode_utf8($key->{station_name1}),"\n";
+}

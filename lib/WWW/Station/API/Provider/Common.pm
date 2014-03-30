@@ -29,6 +29,8 @@ sub dispatch{
   $self->call($url);
 }
 
+use Data::Dumper;
+
 sub call{
   my $self = shift;
   my $url = shift;
