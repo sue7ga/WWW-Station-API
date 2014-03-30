@@ -23,6 +23,13 @@ sub pref_id{
  return $self->{pref_id};
 }
 
+sub get_line_by_prefcd{
+ my $self = shift;
+ my $prefcd = shift;
+ my $linedata = get_lines_by_pref($prefcd);
+ return $linedata;
+}
+
 sub get_neardata{
  my $self = shift;
  my $linecode = shift;
@@ -30,15 +37,20 @@ sub get_neardata{
  return $url;
 }
 
-sub get_line_cd_by_prefcd{
+sub get_linenames_by_prefcd{
  my $self = shift;
  my $pref_cd = shift;
-
  my @line_cds = $self->get_linecds_by_prefcd($pref_cd);
  my @uniq_line_cds = List::MoreUtils::uniq @line_cds;
  my @line_names = $self->get_linename_by_linecd(\@uniq_line_cds);
-
  return @line_names;
+}
+
+sub get_groupdata_by_stationcd{
+ my $self = shift;
+ my $station_cd = shift;
+ my $url = get_ekigroupdata_by_stationcode($station_cd);
+ return $url;
 }
 
 #ラインcdから路線名を返す
@@ -164,11 +176,12 @@ sub join{
  open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
  $csv->column_names($csv->getline($fh));
  my $join_infos = [];
+ my @keys = qw/line_cd station_cd1 station_cd2/;
  while(my $row = $csv->getline_hr($fh)){
    my $join = {};
-   $join->{line_cd} = $row->{line_cd};
-   $join->{station_cd1}  = $row->{station_cd1};
-   $join->{station_cd2} = $row->{station_cd2};
+   foreach my $key(@keys){
+    $join->{$key} = $row->{$key};
+  }
    push @$join_infos,$join;
  }
  close $fh;
@@ -185,22 +198,13 @@ sub line{
   open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
   $csv->column_names($csv->getline($fh));
   my $line_infos = [];
+  my @keys = qw/line_cd company_cd line_name line_name_k line_name_h line_color_c line_color_t line_type lon lat zoom e_status e_sort/;
   while(my $row = $csv->getline_hr($fh)){
-   my $line = {};
-   $line->{line_cd} = $row->{line_cd};
-   $line->{company_cd} = $row->{company_cd};
-   $line->{line_name} = $row->{line_name};
-   $line->{line_name_k} = $row->{line_name_k};
-   $line->{line_name_h} = $row->{line_name_h};
-   $line->{line_color_c} = $row->{line_color_c};
-   $line->{line_color_t} = $row->{line_color_t};
-   $line->{line_type} = $row->{line_type};
-   $line->{lon} = $row->{lon};
-   $line->{lat} = $row->{lat};
-   $line->{zoom} = $row->{zoom};
-   $line->{e_status} = $row->{e_status};
-   $line->{e_sort} = $row->{e_sort};
-   push @$line_infos,$line;
+    my $line = {};
+    foreach my $key(@keys){
+     $line->{$key} = $row->{$key};
+    }
+    push @$line_infos,$line;
   }
   close $fh;
   return $line_infos;
@@ -216,23 +220,12 @@ sub station{
   open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
   $csv->column_names($csv->getline($fh));
   my $station_infos = [];
+  my @keys = qw/station_cd station_g_cd station_name station_name_k station_name_r line_cd pref_cd post add lon lat open_ymd close_ymd e_status e_sort/;
   while(my $row = $csv->getline_hr($fh)){
    my $station = {};
-   $station->{station_cd} = $row->{station_cd};
-   $station->{station_g_cd} = $row->{station_g_cd};
-   $station->{station_name} = $row->{station_name};
-   $station->{station_name_k} = $row->{station_name_k};
-   $station->{station_name_r} = $row->{station_name_r};
-   $station->{line_cd} = $row->{line_cd};
-   $station->{pref_cd} = $row->{pref_cd};
-   $station->{post} = $row->{post};
-   $station->{add} = $row->{add};
-   $station->{lon} = $row->{lon};
-   $station->{lat} = $row->{lat};
-   $station->{open_ymd} = $row->{open_ymd};
-   $station->{close_ymd} = $row->{close_ymd};
-   $station->{e_status} = $row->{e_status};
-   $station->{e_sort} = $row->{esort};
+   foreach my $key(@keys){
+    $station->{$key} = $row->{$key};
+   }
    push @$station_infos,$station;
  }
  close $fh;
@@ -240,7 +233,6 @@ sub station{
 }
 
 1;
-
 
 
 __END__
