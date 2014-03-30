@@ -12,8 +12,6 @@ my $station = WWW::Station::API->new(pref_id => 14);
 
 use Data::Dumper;
 
-my($linename,$stationname) = $station->get_linename_and_stationname_by_prefcd(13);
+my $companyinfos = $station->company;
 
-foreach my $linename(@$stationname){
-  print Encode::encode_utf8($linename),"\n";
-}
+print Dumper $companyinfos;

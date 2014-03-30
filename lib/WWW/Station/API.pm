@@ -23,7 +23,7 @@ sub pref_id{
  return $self->{pref_id};
 }
 
-sub get_line_cd_by_pref{
+sub get_line_cd_by_prefcd{
  my $self = shift;
  my $pref_cd = shift;
 
@@ -140,18 +140,12 @@ sub company{
  open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
  $csv->column_names($csv->getline($fh));
  my $company_infos = [];
+ my @company = qw/company_cd rr_cd company_name company_name_k company_name_h company_name_r company_url company_type e_status e_sort/;
  while(my $row = $csv->getline_hr($fh)){
   my $company = {};
-  $company->{company_cd} = $row->{company_cd};
-  $company->{rr_cd} = $row->{rr_cd};
-  $company->{company_name} = $row->{company_name}; 
-  $company->{company_name_k} = $row->{company_name_k};
-  $company->{company_name_h} = $row->{company_name_h};
-  $company->{company_name_r} = $row->{company_name_r};
-  $company->{company_url} = $row->{company_url};
-  $company->{company_type} = $row->{company_type};
-  $company->{e_status} = $row->{e_status};
-  $company->{e_sort} = $row->{e_sort};
+  foreach my $key(@company){
+    $company->{$key} = $row->{$key};
+  }
   push @$company_infos,$company;
  }
  return $company_infos;
