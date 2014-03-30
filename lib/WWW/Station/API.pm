@@ -46,6 +46,14 @@ sub get_linenames_by_prefcd{
  return @line_names;
 }
 
+sub get_linenames_by_prefcd_via_JSON{
+ my $self = shift;
+ my $pref_cd = shift;
+ my $data = $station->get_line_by_prefcd($pref_cd);
+ my @line_names = map{$_->{line_name}}@{$data->{line}};
+ return @line_names;
+}
+
 sub get_groupdata_by_stationcd{
  my $self = shift;
  my $station_cd = shift;

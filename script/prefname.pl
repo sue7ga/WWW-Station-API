@@ -12,18 +12,17 @@ my $station = WWW::Station::API->new(pref_id => 13);
 
 use Data::Dumper;
 
+#JSON
 my $data = $station->get_line_by_prefcd($station->pref_id);
-
 my @line_names = map{$_->{line_name}}@{$data->{line}};
+
+
+#CSV
 my @line_names2 = $station->get_linenames_by_prefcd($station->pref_id);
 
-print "@line_names","\n";
+
+print scalar @line_names,"\n";
 
 print "--------------------------------------------","\n";
 
-print "@line_names2","\n";
-
-#print @line_names ~~ @line_names2;
-
-
-
+print scalar @line_names2,"\n";
