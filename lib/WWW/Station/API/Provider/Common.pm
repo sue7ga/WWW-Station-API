@@ -8,12 +8,13 @@ use JSON;
 use parent qw/Exporter/;
 our @EXPORT_OK = qw/disptch/;
 use constant API_ENDPOINT => 'http://www.ekidata.jp/api';
+
 use LWP::UserAgent;
 
 sub dispatch{
   my $self = shift;
   my $type = shift;
-  my $arg = shift;
+  my $arg  = shift;
   my $url;
   if($type eq 'pref'){
     $url = API_ENDPOINT."/p/".$arg.".json";

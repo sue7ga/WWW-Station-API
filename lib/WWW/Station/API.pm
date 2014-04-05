@@ -9,18 +9,20 @@ use FindBin;
 use Carp;
 use WWW::Station::API::Pref qw/fetch_pref_cd get_lines_by_pref get_linedata_by_linecode get_ekidata_by_stationcode get_ekigroupdata_by_stationcode get_neardata_by_linecode/;
 
+use DBI;
+
 sub new{
  my($class,%opt) = @_;
  my $self ={
-   pref_id => $opt{pref_id},
+   pref_cd => $opt{pref_cd},
  };
  bless $self,$class;
  $self;
 }
 
-sub pref_id{
+sub pref_cd{
  my $self = shift;
- return $self->{pref_id};
+ return $self->{pref_cd};
 }
 
 sub get_line_by_prefcd{
@@ -43,14 +45,6 @@ sub get_linenames_by_prefcd{
  my @line_cds = $self->get_linecds_by_prefcd($pref_cd);
  my @uniq_line_cds = List::MoreUtils::uniq @line_cds;
  my @line_names = $self->get_linename_by_linecd(\@uniq_line_cds);
- return @line_names;
-}
-
-sub get_linenames_by_prefcd_via_JSON{
- my $self = shift;
- my $pref_cd = shift;
- my $data = $station->get_line_by_prefcd($pref_cd);
- my @line_names = map{$_->{line_name}}@{$data->{line}};
  return @line_names;
 }
 
@@ -197,7 +191,7 @@ sub join{
 }
 
 sub line{
-  my $self = shift; 
+  my $self = shift;
   my $file = $basic_file."/../Data/line20140303free.csv";
   my $csv = Text::CSV->new({
     auto_diag => 1,
@@ -238,6 +232,31 @@ sub station{
  }
  close $fh;
  return $station_infos;
+}
+
+#Database connect
+
+my $dsn = "DBI:mysql:database=Station;host=localhost;port=3000";
+my $dbh = DBI->connect($dsn,'suenaga','hirokihH5',{'RaiseError'=>1});
+
+sub company_sql{
+
+}
+
+sub joni_sql{
+
+}
+
+sub pref_sql{
+
+}
+
+sub station_sql{
+ $dbh->do("CREATE TABLE station (station_cd INTEGER,station_g_cd INTEGER,station_name VARCHAR(20),line_cd INTEGER,pref_cd INTEGER,post INTEGER,add VARCHAR(20),lon VARCHAR(20),lat VARCHAR(20),open_ymd VARCHAR(20),e_status INTEGER,e_sort INTEGER)");
+}
+
+sub line_sql{
+
 }
 
 1;
