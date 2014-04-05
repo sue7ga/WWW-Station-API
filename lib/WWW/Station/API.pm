@@ -237,7 +237,24 @@ sub station{
 #Database connect
 
 my $dsn = "DBI:mysql:database=Station;host=localhost;port=3000";
-my $dbh = DBI->connect($dsn,'suenaga','hirokihH5',{'RaiseError'=>1});
+our $dbh = DBI->connect($dsn,'suenaga','hirokihH5',{'RaiseError'=>1});
+
+sub station_sql{
+  $dbh->do("CREATE TABLE station(station_cd INTEGER,station_g_cd INTEGER,station_name VARCHAR(20),station_name_k VARCHAR(20),station_name_r VARCHAR(20),line_cd INTEGER,pref_cd INTEGER,post VARCHAR(20),add VARCHAR(20),lon VARCHAR(20),lat VARCHAR(20),open_ymd VARCHAR(20),close_ymd VARCHAR(20),e_status INTEGER,e_sort INTEGER)");
+  my $sql = "INSERT INTO station(station_cd,station_g_cd,station_name,station_name_k,station_name_r,line_cd,pref_cd,post,add,lon,lat,open_ymd,close_ymd,e_status,e_sort) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  my $sth = $dbh->prepare($sql);
+  my $file = $basic_file."/../Data/station20140303free.csv";
+  my $csv = Text::CSV->new({
+    auto_diag => 1,
+    binary => 1,
+  });
+  my @keys = qw/station_cd station_g_cd station_name station_name_k station_name_r line_cd pref_cd post add lon lat open_ymd close_ymd e_status e_sort/;
+  open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
+  $csv->column_names($csv->getline($fh));
+  while(my $row = $csv->getline_hr($fh)){
+     $sth->execute($row->{station_cd},$row->{station_g_cd},$row->{station_name},$row->{station_name_k},$row->{station_name_r},$row->{line_cd},$row->{pref_cd},$row->{post},$row->{add},$row->{lon},$row->{lat},$row->{open_ymd},$row->{close_ymd},$row->{e_status},$row->{e_sort});
+  }
+}
 
 sub company_sql{
 
@@ -249,10 +266,6 @@ sub joni_sql{
 
 sub pref_sql{
 
-}
-
-sub station_sql{
- $dbh->do("CREATE TABLE station (station_cd INTEGER,station_g_cd INTEGER,station_name VARCHAR(20),line_cd INTEGER,pref_cd INTEGER,post INTEGER,add VARCHAR(20),lon VARCHAR(20),lat VARCHAR(20),open_ymd VARCHAR(20),e_status INTEGER,e_sort INTEGER)");
 }
 
 sub line_sql{
