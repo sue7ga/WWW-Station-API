@@ -39,14 +39,14 @@ sub get_neardata{
  return $url;
 }
 
-sub get_linenames_by_prefcd{
- my $self = shift;
- my $pref_cd = shift;
- my @line_cds = $self->get_linecds_by_prefcd($pref_cd);
- my @uniq_line_cds = List::MoreUtils::uniq @line_cds;
- my @line_names = $self->get_linename_by_linecd(\@uniq_line_cds);
- return @line_names;
-}
+#sub get_linenames_by_prefcd{
+# my $self = shift;
+# my $pref_cd = shift;
+# my @line_cds = $self->get_linecds_by_prefcd($pref_cd);
+# my @uniq_line_cds = List::MoreUtils::uniq @line_cds;
+# my @line_names = $self->get_linename_by_linecd(\@uniq_line_cds);
+# return @line_names;
+#}
 
 sub get_groupdata_by_stationcd{
  my $self = shift;
@@ -65,36 +65,7 @@ sub get_linename_by_linecd{
 }
 
 #都道府県cdから都道府県内のline_cdsを返す
-sub get_linecds_by_prefcd{
- my $self = shift;
- my $pref = shift;
- my $station_infos = $self->station; 
- my @line_cds = map{$_->{line_cd}}grep{ $_->{pref_cd} eq $pref}@$station_infos;
- return @line_cds;
-}
-
-sub get_stationname_by_prefcd_and_linecd{
-  my $self = shift;
-  #数値
-  my $pref_cd = shift;
-  #配列リファレンス
-  my $line_cds = shift;
-  my $station_infos = $self->station;
-  my @station_names = map{$_->{station_name}}grep{ $_->{line_cd} ~~ @$line_cds and $_->{pref_cd} == $pref_cd}@$station_infos;
-  return @station_names;
-}
-
-sub get_linename_and_stationname_by_prefcd{
- my $self = shift;
- my $prefcd = shift;
- my $station_infos = $self->station;
- my $line_infos = $self->line;
- my @line_cds = map{$_->{line_cd}}grep{$_->{pref_cd} == $prefcd}@$station_infos;
- my @uniq_line_cds = List::MoreUtils::uniq @line_cds;
- my @line_names = map{$_->{line_name}}grep{$_->{line_cd} ~~ @uniq_line_cds}@$line_infos;
- my @stationname = map{$_->{station_name}}grep{$_->{pref_cd} == $prefcd and $_->{line_cd} ~~ @uniq_line_cds}@$station_infos;
- return(\@line_names,\@stationname);
-}
+#pref名前からline名と駅名を返す by MySQL
 
 sub get_pref_id{
  my $self = shift;
@@ -257,7 +228,7 @@ sub station_sql{
 }
 
 sub line_sql{
- #$dbh->do("CREATE TABLE line(line_cd INTEGER,company_c INTEGER,line_name VARCHAR(20),line_name_k VARCHAR(20),line_name_h VARCHAR(20),line_color_c VARCHAR(20),line_color_t VARCHAR(20),line_type VARCHAR(20),lat DOUBLE,zoom INTEGER,e_status INTEGER,e_sort INTEGER)");
+ $dbh->do("CREATE TABLE line(line_cd INTEGER,company_c INTEGER,line_name VARCHAR(20),line_name_k VARCHAR(20),line_name_h VARCHAR(20),line_color_c VARCHAR(20),line_color_t VARCHAR(20),line_type VARCHAR(20),lat DOUBLE,zoom INTEGER,e_status INTEGER,e_sort INTEGER)");
  my $sql = "INSERT INTO line(line_cd,company_c,line_name,line_name_k,line_name_h,line_color_c,line_color_t,line_type,lat,zoom,e_status,e_sort) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
  my $sth = $dbh->prepare($sql);
  my $file = $basic_file."/../Data/line20140303free.csv";
@@ -273,7 +244,7 @@ sub line_sql{
 }
 
 sub company_sql{
- #$dbh->do("CREATE TABLE company(company_cd INTEGER,rr_cd INTEGER,company_name VARCHAR(20),company_name_k VARCHAR(20),company_name_h VARCHAR(20),company_name_r VARCHAR(20),company_url VARCHAR(40),company_type INTEGER,e_status INTEGER,e_sort INTEGER)");
+ $dbh->do("CREATE TABLE company(company_cd INTEGER,rr_cd INTEGER,company_name VARCHAR(20),company_name_k VARCHAR(20),company_name_h VARCHAR(20),company_name_r VARCHAR(20),company_url VARCHAR(40),company_type INTEGER,e_status INTEGER,e_sort INTEGER)");
  my $sql = "INSERT INTO company(company_cd,rr_cd,company_name,company_name_k,company_name_h,company_name_r,company_url,company_type,e_status,e_sort) VALUES (?,?,?,?,?,?,?,?,?,?)";
  my $sth = $dbh->prepare($sql);
  my $file = $basic_file."/../Data/company20130120.csv";
@@ -289,7 +260,7 @@ sub company_sql{
 }
 
 sub join_sql{
-  #$dbh->do("CREATE TABLE nearstation(line_cd INTEGER,station_cd1 INTEGER,station_cd2 INTEGER)");
+  $dbh->do("CREATE TABLE nearstation(line_cd INTEGER,station_cd1 INTEGER,station_cd2 INTEGER)");
   my $sql = "INSERT INTO nearstation(line_cd,station_cd1,station_cd2) VALUES (?,?,?)";
   my $sth = $dbh->prepare($sql);
   my $file = $basic_file."/../Data/join20140303.csv";
@@ -318,6 +289,16 @@ sub pref_sql{
   while(my $row = $csv->getline_hr($fh)){
    $sth->execute($row->{pref_cd},$row->{pref_name});
   }
+}
+
+sub get_linenames_by_prefname{
+ my $self = shift;
+ my $prefname = shift;
+ my $sql = "SELECT pref_cd FROM pref WHERE pref_name = $prefname";
+ my $sth = $dbh->prepare($sql);
+ $sth->execute;
+ my @row = $sth->fetchrow_array;
+ return @row;
 }
 
 1;
