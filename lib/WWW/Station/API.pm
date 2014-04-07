@@ -273,8 +273,8 @@ sub line_sql{
 }
 
 sub company_sql{
- #$dbh->do("CREATE TABLE company(comapny_cd INTEGER,rr_cd INTEGER,company_name VARCHAR(20),company_name_k VARCHAR(20),company_name_h VARCHAR(20),company_name_r VARCHAR(20),company_url VARCHAR(40),company_type INTEGER,e_status INTEGER,e_sort INTEGER)");
- my $sql = "INSERT INTO company(company_cd,rr_cd,copmany_name,company_name_k,company_name_h,company_name_r,company_url,company_type,e_status,e_sort) VALUES (?,?,?,?,?,?,?,?,?,?)";
+ #$dbh->do("CREATE TABLE company(company_cd INTEGER,rr_cd INTEGER,company_name VARCHAR(20),company_name_k VARCHAR(20),company_name_h VARCHAR(20),company_name_r VARCHAR(20),company_url VARCHAR(40),company_type INTEGER,e_status INTEGER,e_sort INTEGER)");
+ my $sql = "INSERT INTO company(company_cd,rr_cd,company_name,company_name_k,company_name_h,company_name_r,company_url,company_type,e_status,e_sort) VALUES (?,?,?,?,?,?,?,?,?,?)";
  my $sth = $dbh->prepare($sql);
  my $file = $basic_file."/../Data/company20130120.csv";
  open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
@@ -284,7 +284,7 @@ sub company_sql{
  });
  $csv->column_names($csv->getline($fh));
  while(my $row = $csv->getline_hr($fh)){
-   $sth->execute($row->{company_cd},$row->{rr_cd},$row->{company_name},$row->{company_name_k},$row->{company_name_h},$row->{company_name_r},$row->{company_url},$row->{company_type},$row->{e_status},$row->{e_sort});
+  $sth->execute($row->{company_cd},$row->{rr_cd},$row->{company_name},$row->{company_name_k},$row->{company_name_h},$row->{company_name_r},$row->{company_url},$row->{company_type},$row->{e_status},$row->{e_sort});
  }
 }
 
