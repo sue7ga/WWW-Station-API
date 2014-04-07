@@ -302,11 +302,7 @@ sub get_linenames_by_prefname{
  my $row_sth = $dbh->prepare($row_sql);
  $row_sth->execute;
  my @row = $row_sth->fetchrow_array;
- my $line_sql = "SELECT line_name FROM line WHERE line_cd = @row";
- my $line_sth = $dbh->prepare($line_sql);
- $line_sth->execute;
- my $line_name = $line_sth->fetchrow_array;
- return $line_name;
+ return "@row";
 }
 
 1;
