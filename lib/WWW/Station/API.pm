@@ -8,6 +8,7 @@ use Text::CSV;
 use FindBin;
 use Carp;
 use WWW::Station::API::Pref qw/fetch_pref_cd get_lines_by_pref get_linedata_by_linecode get_ekidata_by_stationcode get_ekigroupdata_by_stationcode get_neardata_by_linecode/;
+use List::MoreUtils;
 
 use DBI;
 
@@ -330,11 +331,16 @@ sub get_linenames_by_prefname{
   return @line_names;
 }
 
-sub get_stationname_by_prefcd{
+sub get_stationname_by_prefname{
  my $self = shift;
  my $pref_name = shift;
-
-
+ my $prefcd = get_prefname_by_prefcd($pref_name);
+ my $row_sql = "SELECT station_name FROM station WHERE pref_cd = $prefcd";
+ my $row_sth = $dbh->prepare($row_sql);
+ $row_sth->execute;
+ my @array_line_names = $row_sth->fetchall_arrayref;
+ my @line_names = arrayref_to_array(\@array_line_names);
+ return @line_names;
 }
 
 1;
