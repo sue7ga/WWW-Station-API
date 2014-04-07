@@ -128,6 +128,7 @@ sub get_url{
 use Data::Dumper;
 our $basic_file = $FindBin::Bin;
 
+
 sub pref{
  my $self = shift;
  my $file = $basic_file."/../Data/pref.csv";
@@ -240,15 +241,14 @@ my $dsn = "DBI:mysql:database=Station;host=localhost;port=3000";
 our $dbh = DBI->connect($dsn,'suenaga','hirokihH5',{'RaiseError'=>1});
 
 sub station_sql{
-  $dbh->do("CREATE TABLE station(station_cd INTEGER,station_g_cd INTEGER,station_name VARCHAR(20),station_name_k VARCHAR(20),station_name_r VARCHAR(20),line_cd INTEGER,pref_cd INTEGER,post VARCHAR(20),add VARCHAR(20),lon VARCHAR(20),lat VARCHAR(20),open_ymd VARCHAR(20),close_ymd VARCHAR(20),e_status INTEGER,e_sort INTEGER)");
-  my $sql = "INSERT INTO station(station_cd,station_g_cd,station_name,station_name_k,station_name_r,line_cd,pref_cd,post,add,lon,lat,open_ymd,close_ymd,e_status,e_sort) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  $dbh->do("CREATE TABLE station(station_cd INTEGER,station_g_cd INTEGER,station_name VARCHAR(20),station_name_k VARCHAR(20),station_name_r VARCHAR(20),line_cd INTEGER,pref_cd INTEGER,post VARCHAR(20),address VARCHAR(50),lon VARCHAR(40),lat VARCHAR(20),open_ymd VARCHAR(20),close_ymd VARCHAR(20),e_status INTEGER,e_sort INTEGER)");
+  my $sql = "INSERT INTO station(station_cd,station_g_cd,station_name,station_name_k,station_name_r,line_cd,pref_cd,post,address,lon,lat,open_ymd,close_ymd,e_status,e_sort) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
   my $sth = $dbh->prepare($sql);
   my $file = $basic_file."/../Data/station20140303free.csv";
   my $csv = Text::CSV->new({
     auto_diag => 1,
     binary => 1,
   });
-  my @keys = qw/station_cd station_g_cd station_name station_name_k station_name_r line_cd pref_cd post add lon lat open_ymd close_ymd e_status e_sort/;
   open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
   $csv->column_names($csv->getline($fh));
   while(my $row = $csv->getline_hr($fh)){
@@ -256,20 +256,68 @@ sub station_sql{
   }
 }
 
-sub company_sql{
-
+sub line_sql{
+ #$dbh->do("CREATE TABLE line(line_cd INTEGER,company_c INTEGER,line_name VARCHAR(20),line_name_k VARCHAR(20),line_name_h VARCHAR(20),line_color_c VARCHAR(20),line_color_t VARCHAR(20),line_type VARCHAR(20),lat DOUBLE,zoom INTEGER,e_status INTEGER,e_sort INTEGER)");
+ my $sql = "INSERT INTO line(line_cd,company_c,line_name,line_name_k,line_name_h,line_color_c,line_color_t,line_type,lat,zoom,e_status,e_sort) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+ my $sth = $dbh->prepare($sql);
+ my $file = $basic_file."/../Data/line20140303free.csv";
+ open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
+ my $csv  = Text::CSV->new({
+   auto_diag => 1,
+   binary => 1,
+ });
+ $csv->column_names($csv->getline($fh));
+ while(my $row = $csv->getline_hr($fh)){
+   $sth->execute($row->{line_cd},$row->{company_c},$row->{line_name},$row->{line_name_k},$row->{line_name_h},$row->{line_color_c},$row->{line_color_t},$row->{line_type},$row->{lat},$row->{zoom},$row->{e_status},$row->{e_sort});
+ }
 }
 
-sub joni_sql{
+sub company_sql{
+ #$dbh->do("CREATE TABLE company(comapny_cd INTEGER,rr_cd INTEGER,company_name VARCHAR(20),company_name_k VARCHAR(20),company_name_h VARCHAR(20),company_name_r VARCHAR(20),company_url VARCHAR(40),company_type INTEGER,e_status INTEGER,e_sort INTEGER)");
+ my $sql = "INSERT INTO company(company_cd,rr_cd,copmany_name,company_name_k,company_name_h,company_name_r,company_url,company_type,e_status,e_sort) VALUES (?,?,?,?,?,?,?,?,?,?)";
+ my $sth = $dbh->prepare($sql);
+ my $file = $basic_file."/../Data/company20130120.csv";
+ open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
+ my $csv = Text::CSV->new({
+    auto_diag => 1,
+    binary => 1,
+ });
+ $csv->column_names($csv->getline($fh));
+ while(my $row = $csv->getline_hr($fh)){
+   $sth->execute($row->{company_cd},$row->{rr_cd},$row->{company_name},$row->{company_name_k},$row->{company_name_h},$row->{company_name_r},$row->{company_url},$row->{company_type},$row->{e_status},$row->{e_sort});
+ }
+}
 
+sub join_sql{
+  #$dbh->do("CREATE TABLE nearstation(line_cd INTEGER,station_cd1 INTEGER,station_cd2 INTEGER)");
+  my $sql = "INSERT INTO nearstation(line_cd,station_cd1,station_cd2) VALUES (?,?,?)";
+  my $sth = $dbh->prepare($sql);
+  my $file = $basic_file."/../Data/join20140303.csv";
+  open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
+  my $csv  = Text::CSV->new({
+    auto_diag => 1,
+    binary => 1,
+  });
+  $csv->column_names($csv->getline($fh));
+  while(my $row = $csv->getline_hr($fh)){
+    $sth->execute($row->{line_cd},$row->{station_cd1},$row->{station_cd2});
+  }
 }
 
 sub pref_sql{
-
-}
-
-sub line_sql{
-
+  $dbh->do("CREATE TABLE pref(pref_cd INTEGER,pref_name VARCHAR(20))");
+  my $sql = "INSERT INTO pref(pref_cd,pref_name) VALUES (?,?)";
+  my $sth = $dbh->prepare($sql);
+  my $file = $basic_file."/../Data/pref.csv";
+  open(my $fh,'<:encoding(utf8)',$file) or croak "can't open";
+  my $csv  = Text::CSV->new({
+     auto_diag => 1,
+     binary => 1,
+  });
+  $csv->column_names($csv->getline($fh));
+  while(my $row = $csv->getline_hr($fh)){
+   $sth->execute($row->{pref_cd},$row->{pref_name});
+  }
 }
 
 1;

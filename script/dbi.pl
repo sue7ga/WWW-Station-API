@@ -11,4 +11,4 @@ use WWW::Station::API;
 my $station = WWW::Station::API->new(pref_cd => 13);
 use Data::Dumper;
 
-$station->station_sql;
+$station->company_sql;
