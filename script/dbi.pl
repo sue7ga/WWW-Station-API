@@ -11,4 +11,6 @@ use WWW::Station::API;
 my $station = WWW::Station::API->new(pref_cd => 13);
 use Data::Dumper;
 
-$station->company_sql;
+my @row = $station->get_linenames_by_prefname('宮城県');
+
+

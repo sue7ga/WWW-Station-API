@@ -294,15 +294,22 @@ sub pref_sql{
 sub get_linenames_by_prefname{
  my $self = shift;
  my $prefname = shift;
- my $sql = "SELECT pref_cd FROM pref WHERE pref_name = $prefname";
- my $sth = $dbh->prepare($sql);
- $sth->execute;
- my @row = $sth->fetchrow_array;
- return @row;
+ my $pref_sql = "SELECT pref_cd FROM pref WHERE pref_name = '$prefname'";
+ my $pref_sth = $dbh->prepare($pref_sql);
+ $pref_sth->execute;
+ my $row = $pref_sth->fetchrow_array;
+ my $row_sql = "SELECT line_cd FROM station WHERE pref_cd = $row";
+ my $row_sth = $dbh->prepare($row_sql);
+ $row_sth->execute;
+ my @row = $row_sth->fetchrow_array;
+ my $line_sql = "SELECT line_name FROM line WHERE line_cd = @row";
+ my $line_sth = $dbh->prepare($line_sql);
+ $line_sth->execute;
+ my $line_name = $line_sth->fetchrow_array;
+ return $line_name;
 }
 
 1;
-
 
 __END__
 
