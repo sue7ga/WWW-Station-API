@@ -7,7 +7,8 @@ use WWW::Station::API::Pref;
 use WWW::Station::API::Provider::Common;
 
 my $station = WWW::Station::API->new(pref_id => 14);
+my @row = $station->get_linenames_by_prefname('神奈川県');
 
-is($station->get_linenames_by_prefname('神奈川県'),'4');
+is("@row",'4');
 
 done_testing;
