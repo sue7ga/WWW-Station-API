@@ -100,7 +100,6 @@ sub get_url{
 use Data::Dumper;
 our $basic_file = $FindBin::Bin;
 
-
 sub pref{
  my $self = shift;
  my $file = $basic_file."/../Data/pref.csv";
@@ -293,12 +292,12 @@ sub pref_sql{
 }
 
 sub get_prefcd_by_prefname{
-  my $prefname = shift;
-  my $pref_sql = "SELECT pref_cd FROM pref WHERE pref_name = ?";
-  my $pref_sth = $dbh->prepare($pref_sql);
-  $pref_sth->execute($prefname);
-  my $row = $pref_sth->fetchrow_array;
-  return $row; #都道府県cd
+ my $prefname = shift;
+ my $pref_sql = "SELECT pref_cd FROM pref WHERE pref_name = ?";
+ my $pref_sth = $dbh->prepare($pref_sql);
+ $pref_sth->execute($prefname);
+ my $row = $pref_sth->fetchrow_array;
+ return $row; #都道府県cd
 }
 
 sub arrayref_to_array{
@@ -333,15 +332,14 @@ sub get_linenames_by_prefname{
 sub get_stationname_by_prefname{
  my $self = shift;
  my $pref_name = shift;
- my $prefcd = get_prefname_by_prefcd($pref_name);
- my $row_sql = "SELECT station_name FROM station WHERE pref_cd = $prefcd";
+ my $prefcd = get_prefcd_by_prefname($pref_name);
+ my $row_sql = "SELECT station_name FROM station WHERE pref_cd = ?";
  my $row_sth = $dbh->prepare($row_sql);
- $row_sth->execute;
+ $row_sth->execute($prefcd);
  my @array_line_names = $row_sth->fetchall_arrayref;
  my @line_names = arrayref_to_array(\@array_line_names);
  return @line_names;
 }
-
 
 1;
 __END__
