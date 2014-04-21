@@ -292,11 +292,11 @@ sub pref_sql{
   }
 }
 
-sub get_prefname_by_prefcd{
-  my $prefname = shift; 
-  my $pref_sql = "SELECT pref_cd FROM pref WHERE pref_name = '$prefname'";
+sub get_prefcd_by_prefname{
+  my $prefname = shift;
+  my $pref_sql = "SELECT pref_cd FROM pref WHERE pref_name = ?";
   my $pref_sth = $dbh->prepare($pref_sql);
-  $pref_sth->execute;
+  $pref_sth->execute($prefname);
   my $row = $pref_sth->fetchrow_array;
   return $row; #都道府県cd
 }
@@ -313,19 +313,18 @@ sub arrayref_to_array{
 }
 
 sub get_linenames_by_prefname{
-  my $self = shift;
-  my $prefname = shift;
-  my $row = get_prefname_by_prefcd($prefname);
-  my $row_sql = "SELECT line_cd FROM station WHERE pref_cd = $row";
+  my ($self,$prefname)= @_;
+  my $row = get_prefcd_by_prefname($prefname);
+  my $row_sql = "SELECT line_cd FROM station WHERE pref_cd = ?";
   my $row_sth = $dbh->prepare($row_sql);
-  $row_sth->execute;
+  $row_sth->execute($row);
   my @row = $row_sth->fetchall_arrayref;
   my @line_cds = arrayref_to_array(\@row);
   my @uniq_line_cds = List::MoreUtils::uniq @line_cds;
   my @join_line_cds = join(',',@uniq_line_cds);
-  my $line_sql = "SELECT line_name FROM line WHERE line_cd IN (@join_line_cds)";
+  my $line_sql = "SELECT line_name FROM line WHERE line_cd IN (?)";
   my $line_sth = $dbh->prepare($line_sql);
-  $line_sth->execute;
+  $line_sth->execute(@join_line_cds);
   my @arrayref_line_names = $line_sth->fetchall_arrayref;
   my @line_names = arrayref_to_array(\@arrayref_line_names);
   return @line_names;
@@ -343,8 +342,8 @@ sub get_stationname_by_prefname{
  return @line_names;
 }
 
-1;
 
+1;
 __END__
 
 =encoding utf-8
