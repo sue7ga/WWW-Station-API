@@ -366,7 +366,30 @@ sub get_prefname_by_linename{
  return arrayref_to_array(\@prefname);
 }
 
+sub get_prefname_by_stationname{
+ my($self,$stationname) = @_;
+ my $row_sql = "
+  SELECT
+   p.pref_name,
+   l.line_name
+  FROM
+   pref AS p
+     JOIN
+   station AS s
+      ON p.pref_cd = s.pref_cd
+     JOIN
+   line AS l
+      ON l.line_cd = s.line_cd
+   WHERE
+    s.station_name = ?
+  ";
+ my $row_sth = $dbh->prepare($row_sql);
+ $row_sth->execute($stationname);
+ my @prefname = $row_sth->fetchall_arrayref;
+}
+
 1;
+
 
 __END__
 

@@ -10,6 +10,6 @@ my $linenames = $station->get_stationname_by_prefname('東京都');
  
 use Data::Dumper;
 
-my @prefcd = $station->get_prefname_by_linename('京王相模原線');
+my @prefname = $station->get_prefname_by_stationname('橋本');
 
-print Dumper @prefcd;
+print Dumper @prefname;
