@@ -350,6 +350,22 @@ sub get_hash_linename_and_stationname{
  return \%line_station;
 }
 
+sub get_prefname_by_linename{
+ my($self,$linename) = @_;
+ my $row_sql = "
+ SELECT 
+  pref_name
+ FROM 
+  pref
+ WHERE pref_cd IN(
+   SELECT s.pref_cd FROM station AS s JOIN line AS l ON l.line_cd = s.line_cd WHERE l.line_name = ?)
+ ";
+ my $row_sth = $dbh->prepare($row_sql);
+ $row_sth->execute($linename);
+ my @prefname = $row_sth->fetchall_arrayref;
+ return arrayref_to_array(\@prefname);
+}
+
 1;
 
 __END__
