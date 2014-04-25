@@ -326,13 +326,28 @@ sub get_stationname_by_prefname{
 
 sub get_hash_linename_and_stationname{
  my @array_in_array = shift;
- my %linename_stationname;
+ my @linenames;
  foreach my $key(@array_in_array){
    foreach my $ref(@$key){
-     $linename_stationname{$ref->[0]} = $ref->[1];
+     push @linenames,$ref->[0];
    }
  }
- return %linename_stationname;
+ @linenames = List::MoreUtils::uniq @linenames;
+ my @stationnames;
+ my %line_station;
+ foreach my $linename(@linenames){
+  my $station = [];
+  foreach my $key(@array_in_array){
+   foreach my $ref(@$key){
+    if($linename eq $ref->[0]){
+      push @$station,$ref->[1];
+      $line_station{$ref->[0]} = $station;
+    }
+   }
+  }
+  push @stationnames,$station;
+ }
+ return \%line_station;
 }
 
 1;
