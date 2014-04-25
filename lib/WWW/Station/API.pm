@@ -40,15 +40,6 @@ sub get_neardata{
  return $url;
 }
 
-#sub get_linenames_by_prefcd{
-# my $self = shift;
-# my $pref_cd = shift;
-# my @line_cds = $self->get_linecds_by_prefcd($pref_cd);
-# my @uniq_line_cds = List::MoreUtils::uniq @line_cds;
-# my @line_names = $self->get_linename_by_linecd(\@uniq_line_cds);
-# return @line_names;
-#}
-
 sub get_groupdata_by_stationcd{
  my $self = shift;
  my $station_cd = shift;
@@ -321,6 +312,27 @@ sub get_linenames_by_prefname{
  my @line_names = arrayref_to_array(\@row);
  my @uniq_line_names = List::MoreUtils::uniq @line_names;
  return @uniq_line_names;
+}
+
+sub get_stationname_by_prefname{
+ my($self,$pref_name) = @_;
+ my $prefcd = get_prefcd_by_prefname($pref_name);
+ my $row_sql = "SELECT l.line_name,s.station_name FROM line AS l JOIN station AS s ON l.line_cd = s.line_cd WHERE s.pref_cd = ?";
+ my $row_sth = $dbh->prepare($row_sql);
+ $row_sth->execute($prefcd);
+ my @row = $row_sth->fetchall_arrayref;
+ return get_hash_linename_and_stationname(@row);
+}
+
+sub get_hash_linename_and_stationname{
+ my @array_in_array = shift;
+ my %linename_stationname;
+ foreach my $key(@array_in_array){
+   foreach my $ref(@$key){
+     $linename_stationname{$ref->[0]} = $ref->[1];
+   }
+ }
+ return %linename_stationname;
 }
 
 1;
