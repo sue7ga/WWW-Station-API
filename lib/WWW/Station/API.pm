@@ -314,21 +314,13 @@ sub arrayref_to_array{
 sub get_linenames_by_prefname{
  my ($self,$pref_name) = @_;
  my $prefcd = get_prefcd_by_prefname($pref_name);
- my $row_sql = "SELECT l.line_name FROM line AS l station AS s WHERE s.pref_cd = ?";
+ my $row_sql = "SELECT l.line_name FROM line AS l JOIN station AS s ON l.line_cd = s.line_cd WHERE s.pref_cd = ?";
  my $row_sth = $dbh->prepare($row_sql);
  $row_sth->execute($prefcd);
  my @row = $row_sth->fetchall_arrayref;
- return @row;
-}
-
-sub get_stationname_by_prefname{
- my ($self,$pref_name) = @_;
- my $prefcd = get_prefcd_by_prefname($pref_name);
- my $row_sql = "SELECT s.line_name FROM line AS l JOIN station AS s ON l.line_cd = s.line_cd WHERE s.pref_cd = 14";
- my $row_sth = $dbh->prepare($row_sql);
- $row_sth->execute();
- my @row = $row_sth->fetchall_arrayref;
- return @row;
+ my @line_names = arrayref_to_array(\@row);
+ my @uniq_line_names = List::MoreUtils::uniq @line_names;
+ return @uniq_line_names;
 }
 
 1;
