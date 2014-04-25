@@ -235,7 +235,8 @@ sub line_sql{
 }
 
 sub company_sql{
- $dbh->do("CREATE TABLE company(company_cd INTEGER,rr_cd INTEGER,company_name VARCHAR(20),company_name_k VARCHAR(20),company_name_h VARCHAR(20),company_name_r VARCHAR(20),company_url VARCHAR(40),company_type INTEGER,e_status INTEGER,e_sort INTEGER)");
+ $dbh->do("CREATE TABLE company
+ (company_cd INTEGER,rr_cd INTEGER,company_name VARCHAR(20),company_name_k VARCHAR(20),company_name_h VARCHAR(20),company_name_r VARCHAR(20),company_url VARCHAR(40),company_type INTEGER,e_status INTEGER,e_sort INTEGER)");
  my $sql = "INSERT INTO company(company_cd,rr_cd,company_name,company_name_k,company_name_h,company_name_r,company_url,company_type,e_status,e_sort) VALUES (?,?,?,?,?,?,?,?,?,?)";
  my $sth = $dbh->prepare($sql);
  my $file = $basic_file."/../Data/company20130120.csv";
@@ -305,7 +306,12 @@ sub arrayref_to_array{
 sub get_linenames_by_prefname{
  my ($self,$pref_name) = @_;
  my $prefcd = get_prefcd_by_prefname($pref_name);
- my $row_sql = "SELECT l.line_name FROM line AS l JOIN station AS s ON l.line_cd = s.line_cd WHERE s.pref_cd = ?";
+ my $row_sql = 
+     "SELECT 
+        l.line_name FROM line AS l 
+          JOIN station AS s 
+        ON l.line_cd = s.line_cd 
+          WHERE s.pref_cd = ?";
  my $row_sth = $dbh->prepare($row_sql);
  $row_sth->execute($prefcd);
  my @row = $row_sth->fetchall_arrayref;
@@ -317,7 +323,10 @@ sub get_linenames_by_prefname{
 sub get_stationname_by_prefname{
  my($self,$pref_name) = @_;
  my $prefcd = get_prefcd_by_prefname($pref_name);
- my $row_sql = "SELECT l.line_name,s.station_name FROM line AS l JOIN station AS s ON l.line_cd = s.line_cd WHERE s.pref_cd = ?";
+ my $row_sql = 
+   "SELECT l.line_name,s.station_name FROM line AS l 
+      JOIN station AS s ON l.line_cd = s.line_cd 
+    WHERE s.pref_cd = ?";
  my $row_sth = $dbh->prepare($row_sql);
  $row_sth->execute($prefcd);
  my @row = $row_sth->fetchall_arrayref;
@@ -358,7 +367,12 @@ sub get_prefname_by_linename{
  FROM 
   pref
  WHERE pref_cd IN(
-   SELECT s.pref_cd FROM station AS s JOIN line AS l ON l.line_cd = s.line_cd WHERE l.line_name = ?)
+   SELECT s.pref_cd 
+   FROM station AS s 
+     JOIN line AS l 
+   ON l.line_cd = s.line_cd 
+   WHERE l.line_name = ?
+ )
  ";
  my $row_sth = $dbh->prepare($row_sql);
  $row_sth->execute($linename);
@@ -382,10 +396,28 @@ sub get_prefname_by_stationname{
       ON l.line_cd = s.line_cd
    WHERE
     s.station_name = ?
-  ";
+ ";
  my $row_sth = $dbh->prepare($row_sql);
  $row_sth->execute($stationname);
  my @prefname = $row_sth->fetchall_arrayref;
+}
+
+sub get_linename_by_stationname{
+ my($self,$stationname) = @_;
+ my $row_sql = "
+  SELECT
+   l.line_name
+  FROM
+   line AS l
+     JOIN
+   station AS s
+     ON l.line_cd = s.line_cd
+  WHERE
+     s.station_name = ?
+ ";
+ my $row_sth = $dbh->prepare($row_sql);
+ $row_sth->execute($stationname);
+ my @line_names = $row_sth->fetchall_arrayref;
 }
 
 1;
